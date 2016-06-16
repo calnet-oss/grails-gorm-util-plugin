@@ -1,17 +1,39 @@
 package edu.berkeley.util.gorm
 
 import grails.transaction.Transactional
+import org.grails.datastore.mapping.core.Session
 import org.hibernate.SessionFactory
 import org.springframework.transaction.annotation.Propagation
-import org.hibernate.Transaction
+
+import javax.annotation.PostConstruct
 
 @Transactional
 class TransactionService {
     // manage transaction at the method level
     static transactional = false
 
-    // injected
+    // injected if not a unit test
     SessionFactory sessionFactory
+
+    SessionHolder sessionHolder
+
+    /**
+     * Optionally provided session.  If not set, sessionFactory must be.
+     * This may be useful with DomainClassUnitTestMixin and
+     * the simpleDatastore.currentSession that it provides.
+     */
+    TransactionService(Session session = null) {
+        this.sessionHolder = new SessionHolder(gormSession: session)
+    }
+
+    @PostConstruct
+    void init() {
+        this.sessionHolder.hibernateSessionFactory = sessionFactory
+    }
+
+    void setSession(Session session) {
+        sessionHolder.gormSession = session
+    }
 
     /**
      * Execute the closure using a new transaction.  The transaction will be
@@ -23,8 +45,7 @@ class TransactionService {
      * @return The optional return value from the closure.
      */
     Object withTransaction(Closure closure) {
-        if (!sessionFactory)
-            throw new RuntimeException("sessionFactory cannot be null")
+        assertCurrentSession()
         return doTransaction(closure)
     }
 
@@ -41,25 +62,25 @@ class TransactionService {
      * @return The optional return value from the closure.
      */
     Object withClearingTransaction(Closure closure) {
-        if (!sessionFactory)
-            throw new RuntimeException("sessionFactory cannot be null")
+        def session = assertCurrentSession()
         Object result = withTransaction(closure)
-        if (!sessionFactory.currentSession) {
-            throw new RuntimeException("Transaction has been committed but was unable to clear the Hibernate session because sessionFactory.getCurrentSession() returned null")
+        if (!currentSession) {
+            throw new RuntimeException("Transaction has been committed but was unable to clear the session because getCurrentSession() returned null")
         }
+        session = currentSession
         try {
             // clear the Hibernate session cache
-            sessionFactory.currentSession.clear()
+            session.clear()
         }
         catch (Exception e) {
-            throw new RuntimeException("Transaction has been committed but there was an exception clearing the Hibernate session", e)
+            throw new RuntimeException("Transaction has been committed but there was an exception clearing the session", e)
         }
         return result
     }
 
     private static class DoTransactionResult {
-        Transaction closureTransaction
-        Object closureResult
+        def closureTransaction
+        def closureResult
     }
 
     /**
@@ -67,12 +88,15 @@ class TransactionService {
      * Exception.
      */
     protected Object doTransaction(Closure closure) {
-        Transaction originalTransaction = sessionFactory.currentSession.transaction
+        def originalTransaction = currentSession.transaction
         DoTransactionResult doTransactionResult = _doTransaction(closure, originalTransaction)
-        // This is a "sanity check" to confirm that the transaction was
-        // committed upon exit of _doTransaction().
-        if (!doTransactionResult.closureTransaction.wasCommitted()) {
-            throw new RuntimeException("Something went wrong with @Transactional behavior: transaction was not committed upon _doTransaction() exit")
+        // GORM Session doesn't support wasCommitted() on transaction object
+        if (sessionHolder.gormSession == null) {
+            // This is a "sanity check" to confirm that the transaction was
+            // committed upon exit of _doTransaction().
+            if (!doTransactionResult.closureTransaction.wasCommitted()) {
+                throw new RuntimeException("Something went wrong with @Transactional behavior: transaction was not committed upon _doTransaction() exit")
+            }
         }
         return doTransactionResult.closureResult
     }
@@ -82,10 +106,10 @@ class TransactionService {
      * Exception.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception)
-    private Object _doTransaction(Closure closure, Transaction originalTransaction) {
+    private Object _doTransaction(Closure closure, def originalTransaction) {
         if (!closure)
             throw new RuntimeException("closure cannot be null")
-        Transaction currentTransaction = sessionFactory.currentSession.transaction
+        def currentTransaction = currentSession.transaction
         // This is just a "sanity check" to confirm @Transactional
         // annotation is doing what it's supposed to be doing in terms of
         // creating a new transaction.
@@ -96,5 +120,29 @@ class TransactionService {
                 closureTransaction: currentTransaction,
                 closureResult: closure()
         )
+    }
+
+    def getCurrentSession() {
+        return sessionHolder.currentSession
+    }
+
+    private def assertCurrentSession() {
+        def session = currentSession
+        if (!session)
+            throw new RuntimeException("Injected Hibernate sessionFactory and passed-in GORM session cannot both be null: " + sessionFactory)
+        return session
+    }
+
+    private static class SessionHolder {
+        SessionFactory hibernateSessionFactory
+        Session gormSession
+
+        /**
+         * @return A Hibernate or GORM Session object.  If a GORM session is set that will trump any Hibernate session from the injected sessionFactory.
+         */
+        def getCurrentSession() {
+            return (gormSession ?: hibernateSessionFactory?.currentSession)
+        }
+
     }
 }

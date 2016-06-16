@@ -1,7 +1,7 @@
 class GormUtilGrailsPlugin {
     def group = "edu.berkeley.calnet.plugins"
     // the plugin version
-    def version = "0.1-SNAPSHOT"
+    def version = "0.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
@@ -11,7 +11,6 @@ class GormUtilGrailsPlugin {
             "grails-app/controllers/**"
     ]
 
-    // TODO Fill in these fields
     def title = "Gorm Util Plugin" // Headline display name of the plugin
     def author = "Brian Koehmstedt"
     def authorEmail = "bkoehmstedt@berkeley.edu"
