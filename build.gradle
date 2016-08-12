@@ -113,7 +113,7 @@ publishToMavenLocal.dependsOn assemble
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId "gorm-utils"
+            artifactId "gorm-util"
             artifact("${project.name}-${project.version}.zip")
         }
     }

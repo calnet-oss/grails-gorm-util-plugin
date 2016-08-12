@@ -46,7 +46,7 @@ Grails GORM Utility plugin.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "https://github.com/calnet-oss/grails-gorm-utils-plugin/"
+    def documentation = "https://github.com/calnet-oss/grails-gorm-util-plugin/"
 
     // Extra (optional) plugin metadata
 
@@ -60,10 +60,10 @@ Grails GORM Utility plugin.
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
 
     // Location of the plugin's issue tracker.
-    def issueManagement = [ system: "GitHub", url: "https://github.com/calnet-oss/grails-gorm-utils-plugin/issues" ]
+    def issueManagement = [ system: "GitHub", url: "https://github.com/calnet-oss/grails-gorm-util-plugin/issues" ]
 
     // Online location of the plugin's browseable source code.
-    def scm = [ url: "https://github.com/calnet-oss/grails-gorm-utils-plugin" ]
+    def scm = [ url: "https://github.com/calnet-oss/grails-gorm-util-plugin" ]
 
     def doWithWebDescriptor = { xml ->
     }
