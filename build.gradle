@@ -106,7 +106,7 @@ dependencies {
      * END STANDARD GRAILS DEPENDENCIES FROM gradle-grails-bom
      *****************************************************************/
 
-    compile 'edu.berkeley.calnet.libs:domain-util:0.18-SNAPSHOT'
+    compile 'edu.berkeley.calnet.grails.libs:domain-util:1.0.0-SNAPSHOT'
 }
 
 // publishing with './gradlew publish'
