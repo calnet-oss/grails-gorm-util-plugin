@@ -105,6 +105,14 @@ class TransactionService {
         return result
     }
 
+    /**
+     * Clear the Hibernate session cache.
+     */
+    void clearHibernateSession() {
+        def session = assertCurrentSession()
+        session.clear()
+    }
+
     private static class DoTransactionResult {
         def closureTransaction
         def closureResult
