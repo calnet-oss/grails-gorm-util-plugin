@@ -108,8 +108,9 @@ class TransactionService {
     /**
      * Clear the Hibernate session cache.
      */
-    void clearHibernateSession() {
+    void flushAndClearHibernateSession() {
         def session = assertCurrentSession()
+        session.flush()
         session.clear()
     }
 
