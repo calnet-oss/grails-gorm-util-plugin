@@ -50,6 +50,10 @@ buildscript {
 
 allprojects {
     apply plugin: "idea"
+    apply plugin: "groovy"
+
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
 
     group = 'edu.berkeley.calnet.grails.plugins'
     version = '1.1.0-SNAPSHOT'
@@ -70,6 +74,6 @@ subprojects {
             }
         }
         jcenter()
-        mavenCentral()
+        mavenCentral1()
     }
 }
