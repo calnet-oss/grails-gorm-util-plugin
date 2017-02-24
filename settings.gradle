@@ -1,2 +1,2 @@
-rootProject.name = 'gorm-util-plugin'
+rootProject.name = 'gorm-util'
 include 'gorm-util-plugin', 'gorm-util-tests'
