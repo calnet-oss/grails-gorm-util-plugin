@@ -39,14 +39,27 @@
 buildscript {
     repositories {
         mavenLocal()
+        // If using a Maven proxy, put the property settings in
+        // ~/.gradle/gradle.properties for default_proxy_url,
+        // default_proxy_username and default_proxy_password.
+        if (project.hasProperty("default_proxy_url")) {
+            maven {
+                url project.property("default_proxy_url")
+                credentials {
+                    username project.property("default_proxy_username")
+                    password project.property("default_proxy_password")
+                }
+            }
+        }
         maven { url "https://repo.grails.org/grails/core" }
+        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:6.0.4"
     }
 }
-
 
 allprojects {
     apply plugin: "idea"
@@ -58,6 +71,7 @@ allprojects {
     group = 'edu.berkeley.calnet.grails.plugins'
     version = '1.1.0-SNAPSHOT'
 }
+
 subprojects {
     repositories {
         mavenLocal()
@@ -74,6 +88,6 @@ subprojects {
             }
         }
         jcenter()
-        mavenCentral1()
+        mavenCentral()
     }
 }
