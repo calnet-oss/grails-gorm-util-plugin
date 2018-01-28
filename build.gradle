@@ -66,11 +66,7 @@ group projectGroup
 
 allprojects {
     apply plugin: "idea"
-}
 
-subprojects {
-    version parent.version
-    group parent.group
     repositories {
         mavenLocal()
         // If using a Maven proxy, put the property settings in
