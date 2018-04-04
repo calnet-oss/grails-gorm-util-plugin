@@ -27,7 +27,7 @@
 
 package edu.berkeley.util.gorm
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.grails.datastore.mapping.core.Session
 import org.hibernate.SessionFactory
 import org.hibernate.resource.transaction.spi.TransactionStatus
@@ -131,7 +131,7 @@ class TransactionService {
         if (sessionHolder.gormSession == null) {
             // This is a "sanity check" to confirm that the transaction was
             // committed upon exit of _doTransaction().
-            boolean wasCommitted = doTransactionResult.closureTransaction.transactionDriverControl.status == TransactionStatus.COMMITTED
+            boolean wasCommitted = doTransactionResult.closureTransaction.status == TransactionStatus.COMMITTED
             if (!wasCommitted) {
                 throw new RuntimeException("Something went wrong with @Transactional behavior: transaction was not committed upon _doTransaction() exit")
             }
@@ -145,8 +145,9 @@ class TransactionService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception)
     private DoTransactionResult _doTransaction(Closure closure, def originalTransaction) {
-        if (!closure)
+        if (!closure) {
             throw new RuntimeException("closure cannot be null")
+        }
         def currentTransaction = currentSession.transaction
         // This is just a "sanity check" to confirm @Transactional
         // annotation is doing what it's supposed to be doing in terms of

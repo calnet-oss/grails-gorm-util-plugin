@@ -28,8 +28,8 @@
 package edu.berkeley.util.gorm
 
 import edu.berkeley.util.gorm.test.TestPerson
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification

@@ -77,7 +77,9 @@ dependencies {
     compile "org.hibernate:hibernate-core:5.1.2.Final"
     compile "org.hibernate:hibernate-ehcache:5.1.2.Final"
     runtime "com.h2database:h2"
-    testCompile "org.grails:grails-plugin-testing"
+    runtime "org.apache.tomcat:tomcat-jdbc"
+    testCompile "org.grails:grails-gorm-testing-support"
+    testCompile "org.grails:grails-web-testing-support"
 
     compile pdep(rootProject.gormUtilDep)
 }
